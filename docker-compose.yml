@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    platform: linux/arm64/v8
+    # image: arm64v8/postgres
+    image: postgres
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - DOCKER_DEFAULT_PLATFORM=linux/amd64
+      - POSTGRES_USER=$POSTGRESDB_USER
+      - POSTGRES_PASSWORD=$POSTGRESDB_PASSWORD
+      - POSTGRES_DB=$POSTGRESDB_DATABASE
+    ports:
+      - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
+
+    volumes:
+      - data:/data/db
+    networks:
+      - default
+
+  # payload:
+  #   platform: linux/arm64/v8
+  #   depends_on:
+  #     - postgres
+  #   image: node:18-alpine
+  #   env_file: ./.env
+  #   ports:
+  #     - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+  #   volumes:
+  #     - .:/home/node/app
+  #     - node_modules:/home/node/app/node_modules
+  #   working_dir: /home/node/app/
+  #   command: sh -c "yarn install  && yarn dev"
+
+  #   environment:
+  #     - DOCKER_DEFAULT_PLATFORM=linux/amd64
+  #     - DB_HOST=postgres
+  #     - DB_USER=$POSTGRESDB_USER
+  #     - DB_PASSWORD=$POSTGRESDB_PASSWORD
+  #     - DB_NAME=$POSTGRESDB_DATABASE
+  #     - DB_PORT=$POSTGRESDB_DOCKER_PORT
+  # DATABASE_URI: postgres://postgres:postgres@postgres:5432/db
+  # stdin_open: true
+  # tty: true
+
+  # mongo:
+  #   image: mongo:latest
+  #   ports:
+  #     - '27017:27017'
+  #   command:
+  #     - --storageEngine=wiredTiger
+  #   volumes:
+  #     - data:/data/db
+  #   logging:
+  #     driver: none
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  data:
+  node_modules:
